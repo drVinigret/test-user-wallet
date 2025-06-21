@@ -1,0 +1,13 @@
+CREATE TABLE account
+(
+    id      BIGINT NOT NULL,
+    user_id BIGINT,
+    balance DECIMAL(19, 2),
+    CONSTRAINT pk_account PRIMARY KEY (id)
+);
+
+ALTER TABLE account
+    ADD CONSTRAINT uc_account_user UNIQUE (user_id);
+
+ALTER TABLE account
+    ADD CONSTRAINT FK_ACCOUNT_ON_USER FOREIGN KEY (user_id) REFERENCES "user" (id);
