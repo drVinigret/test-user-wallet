@@ -5,6 +5,7 @@ import com.user.wallet.user.wallet.entity.User;
 import com.user.wallet.user.wallet.exception.AccountNotFoundException;
 import com.user.wallet.user.wallet.repository.AccountRepository;
 import com.user.wallet.user.wallet.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +21,12 @@ public class AccountService {
 
   @Value("${deposit.amount.min}")
   private String amountString;
-  private final BigDecimal startDepositAmount = new BigDecimal(amountString);
+  private BigDecimal startDepositAmount;
+
+  @PostConstruct
+  public void init() {
+    this.startDepositAmount = new BigDecimal(amountString);
+  }
 
   @Transactional
   public Account createAccount(Long userId, BigDecimal initialBalance) {

@@ -23,7 +23,8 @@ public class DefaultUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    var user = Optional.of(userRepository.findByName(username))
+    var user = Optional.ofNullable(username)
+      .map(userRepository::findByName)
       .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
     return new org.springframework.security.core.userdetails.User(user.getName(), user.getPassword(), new HashSet<>());
   }

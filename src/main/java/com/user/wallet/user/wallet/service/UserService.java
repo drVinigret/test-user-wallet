@@ -61,7 +61,7 @@ public class UserService {
   }
 
   public User getByUsername(String username) {
-    return Optional.of(userRepository.findByName(username))
+    return Optional.ofNullable(userRepository.findByName(username))
       .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
   }
 

@@ -54,7 +54,7 @@ public class AuthenticateService {
     return new JwtAuthenticationResponse(jwt);
   }
 
-  private boolean validateCredentials(User user, String password, String phone, String email) {
+  boolean validateCredentials(User user, String password, String phone, String email) {
     return user.getPassword().equals(password)
       && (user.getPhones().stream().map(PhoneData::getPhone).toList().contains(phone)
       || user.getEmails().stream().map(EmailData::getEmail).toList().contains(email));
