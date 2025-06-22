@@ -9,12 +9,12 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class UserSpecifications {
 
-  public static Specification<User> hasNameStartingWith(String name) {
+  public static Specification<User> hasNameLike(String name) {
     return (root, query, cb) -> {
       if (name == null) {
         return cb.conjunction();
       }
-      return cb.like(root.get("name"), name + "%");
+      return cb.like(root.get("name"), "%" + name + "%");
     };
   }
 

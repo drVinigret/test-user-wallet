@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -40,18 +40,18 @@ public class UserController {
     @RequestBody List<String> emails,
     @RequestHeader("Authorization") String token
   ) {
-    String userName = jwtService.extractUserName(token);
-    User user = userService.getByUsername(userName);
+    Long userId = jwtService.extractUserId(token);
+    User user = userService.getByUserId(userId);
     userService.addUserEmails(user, emails);
   }
 
-  @PatchMapping("/emails")
+  @PatchMapping("/phones")
   public void addPhones(
     @RequestBody List<String> phones,
     @RequestHeader("Authorization") String token
   ) {
-    String userName = jwtService.extractUserName(token);
-    User user = userService.getByUsername(userName);
+    Long userId = jwtService.extractUserId(token);
+    User user = userService.getByUserId(userId);
     userService.addUserPhones(user, phones);
   }
 }

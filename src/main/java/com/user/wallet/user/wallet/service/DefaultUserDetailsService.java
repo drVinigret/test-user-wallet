@@ -1,6 +1,5 @@
 package com.user.wallet.user.wallet.service;
 
-import com.user.wallet.user.wallet.entity.User;
 import com.user.wallet.user.wallet.repository.UserRepository;
 import java.util.HashSet;
 import java.util.Optional;
@@ -16,18 +15,16 @@ public class DefaultUserDetailsService implements UserDetailsService {
 
   private final UserRepository userRepository;
 
+  public UserDetails getByUserId(Long userId) throws UsernameNotFoundException {
+    var user = userRepository.findById(userId)
+      .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+    return new org.springframework.security.core.userdetails.User(user.getName(), user.getPassword(), new HashSet<>());
+  }
+
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return getCurrentUser(username);
-  }
-
-  public User getByUsername(String username) {
-    return Optional.of(userRepository.findByName(username))
+    var user = Optional.of(userRepository.findByName(username))
       .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
-  }
-
-  public org.springframework.security.core.userdetails.User getCurrentUser(String name) {
-    var user = getByUsername(name);
     return new org.springframework.security.core.userdetails.User(user.getName(), user.getPassword(), new HashSet<>());
   }
 }

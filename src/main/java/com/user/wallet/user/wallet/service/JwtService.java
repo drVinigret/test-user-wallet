@@ -14,7 +14,6 @@ import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +22,8 @@ public class JwtService {
 
   @Value("${token.signing.key}")
   private String jwtSigningKey;
+
+  private static final String USER_ID = "USER_ID";
 
   /**
    * Извлечение имени пользователя из токена
@@ -35,21 +36,24 @@ public class JwtService {
   }
 
   /**
+   * Извлечение ID пользователя из токена
+   *
+   * @param token токен
+   * @return ID пользователя
+   */
+  public Long extractUserId(String token) {
+    return extractClaim(token, claims -> claims.get(USER_ID, Long.class));
+  }
+
+  /**
    * Генерация токена
    *
    * @param user данные пользователя
    * @return токен
    */
   public String generateToken(User user) {
-    String email = user.getEmails()
-      .stream()
-      .findFirst()
-      .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"))
-      .getEmail();
-
     Map<String, Object> claims = new HashMap<>();
-    claims.put("email", email);
-    claims.put("password", user.getPassword());
+    claims.put(USER_ID, user.getId());
     return generateToken(claims, user.getName());
   }
 

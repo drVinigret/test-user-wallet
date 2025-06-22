@@ -7,19 +7,13 @@ import com.user.wallet.user.wallet.repository.EmailDataRepository;
 import com.user.wallet.user.wallet.repository.PhoneDataRepository;
 import com.user.wallet.user.wallet.repository.UserRepository;
 import com.user.wallet.user.wallet.repository.specification.UserSpecifications;
-import com.user.wallet.user.wallet.schema.JwtAuthenticationResponse;
-import com.user.wallet.user.wallet.schema.SignInRequest;
-import com.user.wallet.user.wallet.schema.SignUpRequest;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +24,6 @@ public class UserService {
   private final UserRepository userRepository;
   private final EmailDataRepository emailDataRepository;
   private final PhoneDataRepository phoneDataRepository;
-  private final JwtService jwtService;
-  private final AuthenticationManager authenticationManager;
 
   public User save(User user) {
     return userRepository.save(user);
@@ -73,36 +65,9 @@ public class UserService {
       .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
   }
 
-  public User getById(Long id) {
-    return userRepository.findById(id)
+  public User getByUserId(Long userId) {
+    return userRepository.findById(userId)
       .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
-  }
-
-  public org.springframework.security.core.userdetails.User getCurrentUser(String name) {
-    var user = getByUsername(name);
-    return new org.springframework.security.core.userdetails.User(user.getName(), user.getPassword(), new HashSet<>());
-  }
-
-  public JwtAuthenticationResponse signUp(SignUpRequest request) {
-
-    var user = new User();
-
-    create(user);
-
-    var jwt = jwtService.generateToken(user);
-    return new JwtAuthenticationResponse(jwt);
-  }
-
-  public JwtAuthenticationResponse signIn(SignInRequest request) {
-    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-      request.getUsername(),
-      request.getPassword()
-    ));
-
-    var user = getByUsername(request.getUsername());
-
-    var jwt = jwtService.generateToken(user);
-    return new JwtAuthenticationResponse(jwt);
   }
 
   public Page<User> searchUsers(
@@ -113,7 +78,7 @@ public class UserService {
     Pageable pageable) {
 
     Specification<User> spec = Specification.allOf(
-      UserSpecifications.hasNameStartingWith(name),
+      UserSpecifications.hasNameLike(name),
       UserSpecifications.hasDateOfBirthAfter(dateOfBirth),
       UserSpecifications.hasEmail(email),
       UserSpecifications.hasPhone(phone)

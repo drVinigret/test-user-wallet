@@ -1,7 +1,7 @@
 package com.user.wallet.user.wallet.filter;
 
-import com.user.wallet.user.wallet.service.JwtService;
 import com.user.wallet.user.wallet.service.DefaultUserDetailsService;
+import com.user.wallet.user.wallet.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +10,8 @@ import java.io.IOException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   public static final String BEARER_PREFIX = "Bearer ";
   public static final String HEADER_NAME = "Authorization";
+  private final Logger log = LogManager.getLogger();
+
   private final JwtService jwtService;
   private final DefaultUserDetailsService jwtUserService;
 
@@ -43,10 +47,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // Обрезаем префикс и получаем имя пользователя из токена
     var jwt = authHeader.substring(BEARER_PREFIX.length());
-    var username = jwtService.extractUserName(jwt);
+    var username = jwtService.extractUserId(jwt);
 
-    if (StringUtils.isNotEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
-      UserDetails userDetails = jwtUserService.loadUserByUsername(username);
+    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+      UserDetails userDetails = jwtUserService.getByUserId(username);
 
       // Если токен валиден, то аутентифицируем пользователя
       if (jwtService.isTokenValid(jwt, userDetails)) {
@@ -61,7 +65,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         context.setAuthentication(authToken);
         SecurityContextHolder.setContext(context);
+      } else {
+        log.debug("[JwtAuthenticationFilter] Token not valid");
       }
+    } else {
+      log.debug("[JwtAuthenticationFilter] Token or user not valid");
     }
     filterChain.doFilter(request, response);
   }

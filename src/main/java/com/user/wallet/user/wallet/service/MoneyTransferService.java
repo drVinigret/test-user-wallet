@@ -8,24 +8,29 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.security.auth.login.AccountNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class MoneyTransferService {
 
   private final AccountRepository accountRepository;
+  private final JwtService jwtService;
   private final ReentrantLock transferLock = new ReentrantLock();
 
-  public MoneyTransferService(AccountRepository accountRepository) {
-    this.accountRepository = accountRepository;
-  }
+  private final Logger log = LogManager.getLogger();
 
   @Transactional
   public void transfer(TransferRequest transferRequest, String token) throws AccountNotFoundException {
+    log.info("[MoneyTransferService] Transfer request: {}", transferRequest);
     transferLock.lock();
     try {
-      Account fromAccount = accountRepository.findByUserIdWithLock(transferRequest.getFromUserId())
+      Long userId = jwtService.extractUserId(token);
+      Account fromAccount = accountRepository.findByUserIdWithLock(userId)
         .orElseThrow(() -> new AccountNotFoundException("Sender account not found"));
       Account toAccount = accountRepository.findByUserIdWithLock(transferRequest.getToUserId())
         .orElseThrow(() -> new AccountNotFoundException("Recipient account not found"));
@@ -35,9 +40,12 @@ public class MoneyTransferService {
       fromAccount.setBalance(fromAccount.getBalance().subtract(transferRequest.getAmount()));
       toAccount.setBalance(toAccount.getBalance().add(transferRequest.getAmount()));
 
+      log.info("[MoneyTransferService] Transfer amount {} from {} to {}",
+        transferRequest.getAmount(), fromAccount, toAccount);
       accountRepository.saveAll(List.of(fromAccount, toAccount));
     } finally {
       transferLock.unlock();
+      log.info("[MoneyTransferService] Finish transfer: {}", transferRequest);
     }
   }
 
