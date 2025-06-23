@@ -24,12 +24,15 @@ public class MoneyTransferService {
 
   private final Logger log = LogManager.getLogger();
 
+  public static final String BEARER_PREFIX = "Bearer ";
+
   @Transactional
   public void transfer(TransferRequest transferRequest, String token) throws AccountNotFoundException {
     log.info("[MoneyTransferService] Transfer request: {}", transferRequest);
     transferLock.lock();
     try {
-      Long userId = jwtService.extractUserId(token);
+      var jwt = token.substring(BEARER_PREFIX.length());
+      Long userId = jwtService.extractUserId(jwt);
       Account fromAccount = accountRepository.findByUserIdWithLock(userId)
         .orElseThrow(() -> new AccountNotFoundException("Sender account not found"));
       Account toAccount = accountRepository.findByUserIdWithLock(transferRequest.getToUserId())
@@ -43,9 +46,9 @@ public class MoneyTransferService {
       log.info("[MoneyTransferService] Transfer amount {} from {} to {}",
         transferRequest.getAmount(), fromAccount, toAccount);
       accountRepository.saveAll(List.of(fromAccount, toAccount));
+      log.info("[MoneyTransferService] Finish transfer: {}", transferRequest);
     } finally {
       transferLock.unlock();
-      log.info("[MoneyTransferService] Finish transfer: {}", transferRequest);
     }
   }
 

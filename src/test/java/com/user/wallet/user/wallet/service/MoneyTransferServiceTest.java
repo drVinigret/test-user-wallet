@@ -52,7 +52,7 @@ class MoneyTransferServiceTest {
     Account fromAccount = createAccount(FROM_USER_ID, new BigDecimal("1000.00"));
     Account toAccount = createAccount(TO_USER_ID, new BigDecimal("500.00"));
 
-    when(jwtService.extractUserId(TEST_TOKEN)).thenReturn(FROM_USER_ID);
+    when(jwtService.extractUserId(any())).thenReturn(FROM_USER_ID);
     when(accountRepository.findByUserIdWithLock(FROM_USER_ID)).thenReturn(Optional.of(fromAccount));
     when(accountRepository.findByUserIdWithLock(TO_USER_ID)).thenReturn(Optional.of(toAccount));
 
@@ -69,7 +69,7 @@ class MoneyTransferServiceTest {
     Account fromAccount = createAccount(FROM_USER_ID, new BigDecimal("300.00"));
     Account toAccount = createAccount(TO_USER_ID, new BigDecimal("500.00"));
 
-    when(jwtService.extractUserId(TEST_TOKEN)).thenReturn(FROM_USER_ID);
+    when(jwtService.extractUserId(any())).thenReturn(FROM_USER_ID);
     when(accountRepository.findByUserIdWithLock(FROM_USER_ID)).thenReturn(Optional.of(fromAccount));
     when(accountRepository.findByUserIdWithLock(TO_USER_ID)).thenReturn(Optional.of(toAccount));
 
@@ -83,7 +83,7 @@ class MoneyTransferServiceTest {
     Account fromAccount = createAccount(FROM_USER_ID, new BigDecimal("1000.00"));
     Account toAccount = createAccount(TO_USER_ID, new BigDecimal("500.00"));
 
-    when(jwtService.extractUserId(TEST_TOKEN)).thenReturn(FROM_USER_ID);
+    when(jwtService.extractUserId(any())).thenReturn(FROM_USER_ID);
     when(accountRepository.findByUserIdWithLock(FROM_USER_ID)).thenReturn(Optional.of(fromAccount));
     when(accountRepository.findByUserIdWithLock(TO_USER_ID)).thenReturn(Optional.of(toAccount));
 
@@ -96,7 +96,7 @@ class MoneyTransferServiceTest {
     TransferRequest request = new TransferRequest(FROM_USER_ID, TRANSFER_AMOUNT);
     Account account = createAccount(FROM_USER_ID, new BigDecimal("1000.00"));
 
-    when(jwtService.extractUserId(TEST_TOKEN)).thenReturn(FROM_USER_ID);
+    when(jwtService.extractUserId(any())).thenReturn(FROM_USER_ID);
     when(accountRepository.findByUserIdWithLock(FROM_USER_ID)).thenReturn(Optional.of(account));
 
     assertThrows(IllegalArgumentException.class,
@@ -107,7 +107,7 @@ class MoneyTransferServiceTest {
   void transfer_ThrowsWhenSenderNotFound() {
     TransferRequest request = new TransferRequest(TO_USER_ID, TRANSFER_AMOUNT);
 
-    when(jwtService.extractUserId(TEST_TOKEN)).thenReturn(FROM_USER_ID);
+    when(jwtService.extractUserId(any())).thenReturn(FROM_USER_ID);
     when(accountRepository.findByUserIdWithLock(FROM_USER_ID)).thenReturn(Optional.empty());
 
     assertThrows(AccountNotFoundException.class,
@@ -119,7 +119,7 @@ class MoneyTransferServiceTest {
     TransferRequest request = new TransferRequest(TO_USER_ID, TRANSFER_AMOUNT);
     Account fromAccount = createAccount(FROM_USER_ID, new BigDecimal("1000.00"));
 
-    when(jwtService.extractUserId(TEST_TOKEN)).thenReturn(FROM_USER_ID);
+    when(jwtService.extractUserId(any())).thenReturn(FROM_USER_ID);
     when(accountRepository.findByUserIdWithLock(FROM_USER_ID)).thenReturn(Optional.of(fromAccount));
     when(accountRepository.findByUserIdWithLock(TO_USER_ID)).thenReturn(Optional.empty());
 

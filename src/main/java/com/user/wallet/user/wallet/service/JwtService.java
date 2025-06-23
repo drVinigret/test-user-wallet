@@ -42,7 +42,8 @@ public class JwtService {
    * @return ID пользователя
    */
   public Long extractUserId(String token) {
-    return extractClaim(token, claims -> claims.get(USER_ID, Long.class));
+    final Claims claims = extractAllClaims(token);
+    return claims.get(USER_ID, Long.class);
   }
 
   /**

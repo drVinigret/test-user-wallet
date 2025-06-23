@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.user.wallet.user.wallet.AccountDTO;
 import com.user.wallet.user.wallet.entity.Account;
 import com.user.wallet.user.wallet.entity.User;
 import com.user.wallet.user.wallet.exception.AccountNotFoundException;
@@ -79,7 +80,7 @@ class AccountServiceTest {
     BigDecimal newBalance = new BigDecimal("2000.00");
     when(accountRepository.findById(1L)).thenReturn(Optional.of(testAccount));
     when(accountRepository.save(any(Account.class))).thenReturn(testAccount);
-    Account result = accountService.updateBalance(1L, newBalance);
+    AccountDTO result = accountService.updateBalance(1L, newBalance);
 
     assertEquals(newBalance, result.getBalance());
     verify(accountRepository, times(1)).save(testAccount);
@@ -112,10 +113,10 @@ class AccountServiceTest {
   @Test
   void getAccount_Success() {
     when(accountRepository.findById(1L)).thenReturn(Optional.of(testAccount));
-    Account result = accountService.getAccount(1L);
+    AccountDTO result = accountService.getAccount(1L);
 
     assertNotNull(result);
-    assertEquals(1L, result.getId());
+    assertEquals(1L, result.getAccountId());
   }
 
   @Test

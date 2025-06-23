@@ -21,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -52,6 +54,7 @@ public class SecurityConfiguration {
       .authorizeHttpRequests(request -> request
         // Можно указать конкретный путь, * - 1 уровень вложенности, ** - любое количество уровней вложенности
         .requestMatchers("/auth/**").permitAll()
+        .requestMatchers("/auth/sign-up").permitAll()
         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
         .anyRequest().authenticated())
       .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
@@ -77,5 +80,17 @@ public class SecurityConfiguration {
   public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
     throws Exception {
     return config.getAuthenticationManager();
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.addAllowedOrigin("*");
+    configuration.addAllowedMethod("*");
+    configuration.addAllowedHeader("*");
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
   }
 }

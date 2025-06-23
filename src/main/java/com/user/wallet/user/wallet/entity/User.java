@@ -3,6 +3,7 @@ package com.user.wallet.user.wallet.entity;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -16,7 +17,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "user")
+@Table(name = "\"user\"")
 public class User {
 
   public User() {
@@ -46,6 +47,7 @@ public class User {
   private List<PhoneData> phones = new ArrayList<>();
 
   @OneToOne(mappedBy = "user", cascade = ALL)
+  @JsonBackReference
   private Account account;
 }
 

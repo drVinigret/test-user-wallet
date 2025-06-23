@@ -11,9 +11,9 @@ import org.springframework.stereotype.Repository;
 @CacheConfig(cacheNames = "users")
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
-  @Cacheable(key = "#name")
+  @Cacheable(key = "#name", unless = "#result == false")
   boolean existsByName(String name);
 
-  @Cacheable(key = "#name")
+  @Cacheable(key = "#name", unless = "#result == null")
   User findByName(String name);
 }

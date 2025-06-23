@@ -3,6 +3,8 @@ package com.user.wallet.user.wallet.schema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import lombok.Data;
@@ -23,7 +25,8 @@ public class SignUpRequest {
   private String email;
 
   @Schema(description = "Дата рождения", example = "2000-01-01")
-  @NotBlank(message = "Дата рождения не может быть пустым")
+  @NotNull(message = "Дата рождения не может быть пустой")
+  @Past(message = "Дата рождения должна быть в прошлом")
   private LocalDate dateOfBirth;
 
   @Schema(description = "Пароль", example = "my_1secret1_password")

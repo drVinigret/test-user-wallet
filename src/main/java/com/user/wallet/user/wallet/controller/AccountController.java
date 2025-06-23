@@ -1,5 +1,6 @@
 package com.user.wallet.user.wallet.controller;
 
+import com.user.wallet.user.wallet.AccountDTO;
 import com.user.wallet.user.wallet.entity.Account;
 import com.user.wallet.user.wallet.model.TransferRequest;
 import com.user.wallet.user.wallet.service.AccountService;
@@ -27,25 +28,23 @@ public class AccountController {
   private final AccountService accountService;
   private final MoneyTransferService moneyTransferService;
 
-  @PostMapping
-  public ResponseEntity<Account> createAccount(
-    @RequestParam Long userId,
-    @RequestParam BigDecimal initialBalance) {
-    Account account = accountService.createAccount(userId, initialBalance);
-    return ResponseEntity.ok(account);
-  }
-
   @PutMapping("/{accountId}/balance")
-  public ResponseEntity<Account> updateBalance(
+  public ResponseEntity<AccountDTO> updateBalance(
     @PathVariable Long accountId,
     @RequestParam BigDecimal newBalance) {
-    Account account = accountService.updateBalance(accountId, newBalance);
+    AccountDTO account = accountService.updateBalance(accountId, newBalance);
     return ResponseEntity.ok(account);
   }
 
   @GetMapping("/{accountId}")
-  public ResponseEntity<Account> getAccount(@PathVariable Long accountId) {
-    Account account = accountService.getAccount(accountId);
+  public ResponseEntity<AccountDTO> getAccount(@PathVariable Long accountId) {
+    AccountDTO account = accountService.getAccount(accountId);
+    return ResponseEntity.ok(account);
+  }
+
+  @GetMapping("/by-user/{userId}")
+  public ResponseEntity<AccountDTO> getAccountByUserId(@PathVariable Long userId) {
+    AccountDTO account = accountService.getAccountByUserId(userId);
     return ResponseEntity.ok(account);
   }
 
